@@ -87,16 +87,16 @@ paths:
                 format: "int32"
                 description: "團購結束時間"
                 example: "1680153140"
-              min_people:
+              min_amount:
                 type: "number"
                 format: "int64"
-                description: "最少人數"
+                description: "最少數量"
                 minimum: 2
                 example: "2"
-              max_people:
+              max_amount:
                 type: "number"
                 format: "int64"
-                description: "最多人數"
+                description: "最多數量"
                 minimum: 2
                 example: "2"
               invited:
@@ -111,8 +111,8 @@ paths:
               - category
               - start_time
               - end_time
-              - min_people
-              - max_people
+              - min_amount
+              - max_amount
               - invited
       responses:
         "200":
@@ -250,7 +250,7 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Event"
+            $ref: "#/definitions/DefaultMsg"
         "404":
           description: "Event not found"
           schema:
@@ -260,7 +260,7 @@ paths:
           schema:
             $ref: "#/definitions/DefaultError"
   /events/{event_id}/join:
-    post:
+    put:
       tags:
         - "event"
       description: "加入團購"
@@ -273,6 +273,21 @@ paths:
           description: "團購ID"
           required: true
           type: "string"
+        - name: "body"
+          in: "body"
+          description: "加入團購"
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: "number"
+                format: "int64"
+                description: "購買數量"
+                minimum: 1
+                example: "1"
+            required:
+              - amount
       responses:
         "200":
           description: "successful operation"
@@ -304,7 +319,7 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Event"
+            $ref: "#/definitions/DefaultMsg"
         "404":
           description: "Event not found"
           schema:
@@ -462,23 +477,41 @@ definitions:
         format: "int32"
         description: "團購結束時間"
         example: "1680153140"
-      min_people:
+      min_amount:
         type: "number"
         format: "int64"
-        description: "最少人數"
+        description: "最少數量"
         minimum: 2
         example: "2"
-      max_people:
+      max_amount:
         type: "number"
         format: "int64"
-        description: "最多人數"
+        description: "最多數量"
         minimum: 2
         example: "2"
       members:
         type: "array"
         description: "已參加的成員（含發起者）清單（只限發起者可以看到）"
         items:
-          $ref: "#/definitions/User"
+          properties:
+            name:
+              type: "string"
+            email:
+              type: "string"
+              format: "email"
+            phone:
+              type: "string"
+              pattern: '^09[0-9]{8}$'
+            amount:
+              type: "number"
+              format: "int32"
+              example: "1"
+          required:
+            - id
+            - name
+            - email
+            - phone
+            - amount
     required:
       - id
       - name
@@ -486,8 +519,8 @@ definitions:
       - category
       - start_time
       - end_time
-      - min_people
-      - max_people
+      - min_amount
+      - max_amount
   EventMsg:
     type: "object"
     properties:
@@ -510,6 +543,19 @@ definitions:
       - created_at
   Category:
     type: "string"
+  DefaultMsg:
+    type: object
+    properties:
+      message:
+        type: string
+        description: "訊息"
+        example: "success"
+      message_code:
+        type: string
+        description: "訊息代碼"
+        example: "message_code"
+    required:
+      - message
   DefaultError:
     type: object
     properties:
@@ -529,11 +575,7 @@ definitions:
       id:
         type: "string"
         format: "uuid"
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
+      name:
         type: "string"
       email:
         type: "string"
