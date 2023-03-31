@@ -532,10 +532,22 @@ definitions:
         type: "string"
         description: "訊息內容"
         example: "訊息內容"
-      name:
-        type: "string"
-        description: "訊息發送者名稱"
-        example: "訊息發送者名稱"
+      user:
+        type: "object"
+        description: "發送者"
+        properties:
+          name:
+            type: "string"
+            description: "使用者名稱"
+            example: "使用者名稱"
+          avatar:
+            type: "string"
+            format: "url"
+            description: "使用者頭像"
+            example: "https://example.com/avatar.png"
+        required:
+          - name
+          - avatar
       created_at:
         type: "number"
         format: "int32"
@@ -579,6 +591,9 @@ definitions:
       id:
         type: "string"
         format: "uuid"
+      avatar:
+        type: "string"
+        format: "url"
       name:
         type: "string"
       email:
