@@ -532,6 +532,10 @@ definitions:
         type: "string"
         description: "訊息內容"
         example: "訊息內容"
+      name:
+        type: "string"
+        description: "訊息發送者名稱"
+        example: "訊息發送者名稱"
       created_at:
         type: "number"
         format: "int32"
