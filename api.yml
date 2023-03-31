@@ -11,34 +11,34 @@ info:
 host: "o2gather.ptass.org"
 basePath: "/api/v1"
 tags:
-- name: "user"
-  description: "Just User setting"
-- name: "event"
-  description: "團購"
+  - name: "user"
+    description: "使用者相關"
+  - name: "event"
+    description: "團購相關"
+  - name: "category"
+    description: "類別相關"
 schemes:
-- "https"
-- "http"
+  - "https"
 paths:
   /events:
     get:
       tags:
-      - "event"
-      summary: "Get all events"
-      description: "Get all events"
+        - "event"
+      description: "取得所有團購"
       operationId: "getAllEvents"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "category"
-        in: "query"
-        description: "values that need to be considered for filter"
-        required: false
-        type: "string"
-      - name: "search"
-        in: "query"
-        description: "values that need to be considered for filter"
-        required: false
-        type: "string"
+        - name: "category"
+          in: "query"
+          description: "values that need to be considered for filter"
+          required: false
+          type: "string"
+        - name: "search"
+          in: "query"
+          description: "values that need to be considered for filter"
+          required: false
+          type: "string"
       responses:
         "200":
           description: "successful operation"
@@ -46,610 +46,559 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Event"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
     post:
       tags:
-      - "event"
-      summary: "Get all events"
-      description: "Get all events"
-      operationId: "createAllEvents"
+        - "event"
+      description: "新增團購"
+      operationId: "createEvent"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-            description:
-              type: string
-            category:
-              type: string
-            start_time:
-              type: string
-              format: date-time
-            end_time:
-              type: string
-              format: date-time
-            min_people:
-              type: integer
-              format: int32
-            max_people:
-              type: integer
-              format: int32
-            invited:
-              type: array
-              description: "user email list"
-              items:
-                type: string
-          required:
-            - name
-            - description
-            - category
-            - start_time
-            - end_time
+        - in: "body"
+          name: "body"
+          description: "新增團購"
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: "string"
+                description: "團購名稱"
+                example: "團購名稱"
+              description:
+                type: "string"
+                description: "團購描述"
+                example: "團購描述"
+              category:
+                type: "string"
+                description: "團購類別"
+                example: "團購類別"
+              start_time:
+                type: "number"
+                format: "int32"
+                description: "團購開始時間"
+                example: "1680153135"
+              end_time:
+                type: "number"
+                format: "int32"
+                description: "團購結束時間"
+                example: "1680153140"
+              min_amount:
+                type: "number"
+                format: "int64"
+                description: "最少數量"
+                minimum: 2
+                example: "2"
+              max_amount:
+                type: "number"
+                format: "int64"
+                description: "最多數量"
+                minimum: 2
+                example: "2"
+              invited:
+                type: "array"
+                description: "邀請名單 (email)"
+                items:
+                  type: "string"
+                  format: "email"
+            required:
+              - name
+              - description
+              - category
+              - start_time
+              - end_time
+              - min_amount
+              - max_amount
+              - invited
       responses:
         "200":
           description: "successful operation"
           schema:
-            type: "object"
+            $ref: "#/definitions/Event"
+        "400":
+          description: "Invalid body"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
   /events/{event_id}:
     get:
       tags:
-      - "event"
-      summary: "Get event by id"
-      description: "Get event by id"
-      operationId: "getEventById"
+        - "event"
+      description: "取得團購"
+      operationId: "getEvent"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Event"
-        "400":
-          description: "Invalid event id supplied"
         "404":
           description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
     patch:
       tags:
-      - "event"
-      summary: "Update event by id"
-      description: "Update event by id"
-      operationId: "updateEventById"
+        - "event"
+      description: "更新團購"
+      operationId: "updateEvent"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          type: object
-          properties:
-            name:
-              type: string
-            description:
-              type: string
-            category:
-              type: string
-            start_time:
-              type: string
-              format: date-time
-            end_time:
-              type: string
-              format: date-time
-            min_people:
-              type: integer
-              format: int32
-            max_people:
-              type: integer
-              format: int32
-            status:
-              type: string
-              description: "open, close, cancel"
-          required:
-            - name
-            - description
-            - category
-            - start_time
-            - end_time
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "更新團購"
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: "string"
+                description: "團購名稱"
+                example: "團購名稱"
+              description:
+                type: "string"
+                description: "團購描述"
+                example: "團購描述"
+              category:
+                type: "string"
+                description: "團購類別"
+                example: "團購類別"
+              start_time:
+                type: "number"
+                format: "int32"
+                description: "團購開始時間"
+                example: "1680153135"
+              end_time:
+                type: "number"
+                format: "int32"
+                description: "團購結束時間"
+                example: "1680153140"
+              min_people:
+                type: "number"
+                format: "int64"
+                description: "最少人數"
+                minimum: 2
+                example: "2"
+              max_people:
+                type: "number"
+                format: "int64"
+                description: "最多人數"
+                minimum: 2
+                example: "2"
+            required:
+              - name
+              - description
+              - category
+              - start_time
+              - end_time
+              - min_people
+              - max_people
       responses:
         "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Event"
         "400":
-          description: "Invalid event id supplied"
+          description: "Invalid body"
+          schema:
+            $ref: "#/definitions/DefaultError"
         "404":
-          description: "Event not found" 
+          description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
     delete:
       tags:
-      - "event"
-      summary: "Delete event by id"
-      description: "Delete event by id"
-      operationId: "deleteEventById"
+        - "event"
+      description: "刪除團購"
+      operationId: "deleteEvent"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Event"
-        "400":
-          description: "Invalid event id supplied"
+            $ref: "#/definitions/DefaultMsg"
         "404":
           description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
   /events/{event_id}/join:
-    post:
+    put:
       tags:
-      - "event"
-      summary: "Join event by id"
-      description: "Join event by id"
-      operationId: "joinEventById"
+        - "event"
+      description: "加入團購"
+      operationId: "joinEvent"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
+        - name: "body"
+          in: "body"
+          description: "加入團購"
+          required: true
+          schema:
+            type: object
+            properties:
+              amount:
+                type: "number"
+                format: "int64"
+                description: "購買數量"
+                minimum: 1
+                example: "1"
+            required:
+              - amount
       responses:
         "200":
           description: "successful operation"
           schema:
             $ref: "#/definitions/Event"
-        "400":
-          description: "Invalid event id supplied"
         "404":
           description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
   /events/{event_id}/leave:
     post:
       tags:
-      - "event"
-      summary: "Leave event by id"
-      description: "Leave event by id"
-      operationId: "leaveEventById"
+        - "event"
+      description: "離開團購"
+      operationId: "leaveEvent"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Event"
-        "400":
-          description: "Invalid event id supplied"
+            $ref: "#/definitions/DefaultMsg"
         "404":
           description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
   /events/{event_id}/msgs:
     get:
       tags:
-      - "event"
-      summary: "Get all messages of event by id"
-      description: "Get all messages of event by id"
-      operationId: "getAllMsgsOfEventById"
+        - "event"
+      description: "取得團購的公告"
+      operationId: "getEventMsgs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
           schema:
-            type: "array"
+            type: array
             items:
-              $ref: "#/definitions/Message"
-        "400":
-          description: "Invalid event id supplied"
+              $ref: "#/definitions/EventMsg"
         "404":
           description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
     post:
       tags:
-      - "event"
-      summary: "Send message to event by id"
-      description: "Send message to event by id"
-      operationId: "sendMsgToEventById"
+        - "event"
+      description: "新增團購的公告"
+      operationId: "createEventMsg"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "event_id"
-        in: "path"
-        description: "event id"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          type: object
-          properties:
-            msg:
-              type: string
-          required:
-            - msg
+        - name: "event_id"
+          in: "path"
+          description: "團購ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "新增團購訊息"
+          required: true
+          schema:
+            type: object
+            properties:
+              content:
+                type: "string"
+                description: "訊息內容"
+                example: "訊息內容"
+            required:
+              - content
       responses:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Event"
+            $ref: "#/definitions/EventMsg"
         "400":
-          description: "Invalid event id supplied"
+          description: "Invalid body"
+          schema:
+            $ref: "#/definitions/DefaultError"
         "404":
           description: "Event not found"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
   /categories:
     get:
       tags:
-      - "event"
-      summary: "Get all categories"
-      description: "Get all categories"
-      operationId: "getAllCategories"
+        - "category"
+      description: "取得所有類別"
+      operationId: "getCategories"
       produces:
-      - "application/json"
+        - "application/json"
       responses:
         "200":
           description: "successful operation"
           schema:
-            type: "array"
+            type: array
             items:
               $ref: "#/definitions/Category"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
   /users/{user_id}/events:
     get:
       tags:
-      - "event"
-      summary: "Get all events by user id"
-      description: "Get all events by user id"
-      operationId: "getAllEventsByUserId"
+        - "user"
+      description: "取得使用者的團購"
+      operationId: "getUserEvents"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - name: "user_id"
-        in: "path"
-        description: "user id"
-        required: true
-        type: "string"
-      - name: "status"
-        in: "query"
-        description: "values that need to be considered for filter"
-        required: false
-        type: "string"
+        - name: "user_id"
+          in: "path"
+          description: "使用者ID"
+          required: true
+          type: "string"
       responses:
         "200":
           description: "successful operation"
           schema:
-            type: "array"
+            type: array
             items:
               $ref: "#/definitions/Event"
-        "400":
-          description: "Invalid user id supplied"
         "404":
           description: "User not found"
-  /user:
-    post:
-      tags:
-      - "user"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/login:
-    get:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        "200":
-          description: "successful operation"
           schema:
-            type: "string"
-          headers:
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-        "400":
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
-      tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        "200":
-          description: "successful operation"
+            $ref: "#/definitions/DefaultError"
+        "500":
+          description: "Internal Server Error"
           schema:
-            $ref: "#/definitions/User"
-        "400":
-          description: "Invalid username supplied"
-        "404":
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        "400":
-          description: "Invalid user supplied"
-        "404":
-          description: "User not found"
-    delete:
-      tags:
-      - "user"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
-      produces:
-      - "application/xml"
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
-      responses:
-        "400":
-          description: "Invalid username supplied"
-        "404":
-          description: "User not found"
-securityDefinitions:
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
-    flow: "implicit"
-    scopes:
-      write:pets: "modify pets in your account"
-      read:pets: "read your pets"
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
+            $ref: "#/definitions/DefaultError"
 definitions:
   Event:
     type: "object"
     properties:
       id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
         type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-        default: false
-  Order:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
-        type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-        default: false
-    xml:
-      name: "Order"
-  Category:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
+        format: "uuid"
       name:
         type: "string"
-    xml:
-      name: "Category"
+        description: "團購名稱"
+        example: "團購名稱"
+      description:
+        type: "string"
+        description: "團購描述"
+        example: "團購描述"
+      category:
+        type: "string"
+        description: "團購類別"
+        example: "團購類別"
+      start_time:
+        type: "number"
+        format: "int32"
+        description: "團購開始時間"
+        example: "1680153135"
+      end_time:
+        type: "number"
+        format: "int32"
+        description: "團購結束時間"
+        example: "1680153140"
+      min_amount:
+        type: "number"
+        format: "int64"
+        description: "最少數量"
+        minimum: 2
+        example: "2"
+      max_amount:
+        type: "number"
+        format: "int64"
+        description: "最多數量"
+        minimum: 2
+        example: "2"
+      members:
+        type: "array"
+        description: "已參加的成員（含發起者）清單（只限發起者可以看到）"
+        items:
+          properties:
+            name:
+              type: "string"
+            email:
+              type: "string"
+              format: "email"
+            phone:
+              type: "string"
+              pattern: '^09[0-9]{8}$'
+            amount:
+              type: "number"
+              format: "int32"
+              example: "1"
+          required:
+            - id
+            - name
+            - email
+            - phone
+            - amount
+    required:
+      - id
+      - name
+      - description
+      - category
+      - start_time
+      - end_time
+      - min_amount
+      - max_amount
+  EventMsg:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "訊息ID"
+        example: "訊息ID"
+      content:
+        type: "string"
+        description: "訊息內容"
+        example: "訊息內容"
+      user:
+        type: "object"
+        description: "發送者"
+        properties:
+          name:
+            type: "string"
+            description: "使用者名稱"
+            example: "使用者名稱"
+          avatar:
+            type: "string"
+            format: "url"
+            description: "使用者頭像"
+            example: "https://example.com/avatar.png"
+        required:
+          - name
+          - avatar
+      created_at:
+        type: "number"
+        format: "int32"
+        description: "訊息建立時間"
+        example: "1680153135"
+    required:
+      - id
+      - content
+      - created_at
+  Category:
+    type: "string"
+  DefaultMsg:
+    type: object
+    properties:
+      message:
+        type: string
+        description: "訊息"
+        example: "success"
+      message_code:
+        type: string
+        description: "訊息代碼"
+        example: "message_code"
+    required:
+      - message
+  DefaultError:
+    type: object
+    properties:
+      message:
+        type: string
+        description: "錯誤訊息"
+        example: "error occur"
+      error_code:
+        type: string
+        description: "錯誤代碼"
+        example: "error_code"
+    required:
+      - message
   User:
     type: "object"
     properties:
       id:
-        type: "integer"
-        format: "int64"
-      username:
         type: "string"
-      firstName:
+        format: "uuid"
+      avatar:
         type: "string"
-      lastName:
+        format: "url"
+      name:
         type: "string"
       email:
         type: "string"
-      password:
-        type: "string"
+        format: "email"
       phone:
         type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
-  Tag:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Tag"
-  Pet:
-    type: "object"
-    required:
-    - "name"
-    - "photoUrls"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      category:
-        $ref: "#/definitions/Category"
-      name:
-        type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          name: "photoUrl"
-          wrapped: true
-        items:
-          type: "string"
-      tags:
-        type: "array"
-        xml:
-          name: "tag"
-          wrapped: true
-        items:
-          $ref: "#/definitions/Tag"
-      status:
-        type: "string"
-        description: "pet status in the store"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-    xml:
-      name: "Pet"
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+        pattern: '^09[0-9]{8}$'
