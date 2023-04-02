@@ -420,8 +420,8 @@ paths:
           schema:
             $ref: "#/definitions/DefaultError"
 
-  /user/login:
-    get:
+  /login:
+    post:
       tags:
         - "user"
       description: "導向至 https://accounts.google.com/o/oauth2/v2/auth 取得同意授權後，取得ID、姓名"
@@ -437,8 +437,8 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/DefaultError"
-  /user/logout:
-    get:
+  /logout:
+    post:
       tags:
         - "user"
       description: "登出"
@@ -448,6 +448,11 @@ paths:
       responses:
         "200":
           description: "successful operation"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
+            
   /users/{user_id}:
     get:
       tags:
@@ -473,6 +478,57 @@ paths:
             $ref: "#/definitions/DefaultError"
         "500":
           description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/DefaultError"
+    patch:
+      tags:
+        - "user"
+      description: "更新基本資料"
+      operationId: "updateUserInfo"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "user_id"
+          in: "path"
+          description: "使用者ID"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "user info to be updated"
+          required: true
+          schema:
+            type: object
+            properties:
+              avatar:
+                type: "string"
+                description: "avatar path"
+              name:
+                type: "string"
+                description: "使用者名稱"
+              email:
+                type: "string"
+                format: "email"
+                description: "avatar path"
+              phone:
+                type: "string"
+                pattern: '^09[0-9]{8}$'
+                description: "phone number"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Invalid body"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "403":
+          description: "Permission Denied"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "404":
+          description: "User not found"
           schema:
             $ref: "#/definitions/DefaultError"
   /users/{user_id}/events:
@@ -504,50 +560,7 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/DefaultError"
-  /user/{user_id}/update:
-    post:
-      tags:
-        - "user"
-      description: "更新基本資料"
-      operationId: "updateUserInfo"
-      produces:
-        - "application/json"
-      parameters:
-        - name: "user_id"
-          in: "path"
-          description: "user id to be updated"
-          required: true
-          type: "string"
-        - name: "avatar"
-          in: "query"
-          description: "avatar path"
-          required: false
-          type: "string"
-          format: "url"
-        - name: "phone"
-          in: "query"
-          description: "phone"
-          required: false
-          type: "string"
-          pattern: '^09[0-9]{8}$'
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        "400":
-          description: "Invalid body"
-          schema:
-            $ref: "#/definitions/DefaultError"
-        "403":
-          description: "Permission Denied"
-          schema:
-            $ref: "#/definitions/DefaultError"
-        "404":
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/DefaultError"
-
+            
 definitions:
   Event:
     type: "object"
