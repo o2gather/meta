@@ -429,10 +429,16 @@ paths:
       produces:
         - "applicatoin/json"
       responses:
-        "200":
-          description: "successful operation"
+        "303":
+          description: "redirect to homepage"
+        "401":
+          description: "Unauthorized"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/DefaultError"
+        "409":
+          description: "Conflict"
+          schema:
+            $ref: "#/definitions/DefaultError"
         "500":
           description: "Internal Server Error"
           schema:
@@ -448,11 +454,13 @@ paths:
       responses:
         "200":
           description: "successful operation"
+          schema:
+            $ref: "#/definitions/DefaultMsg"
         "500":
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/DefaultError"
-            
+
   /users/{user_id}:
     get:
       tags:
@@ -472,8 +480,8 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/User"
-        "404":
-          description: "User not found"
+        "403":
+          description: "Permission Denied"
           schema:
             $ref: "#/definitions/DefaultError"
         "500":
@@ -519,16 +527,12 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/User"
-        "400":
-          description: "Invalid body"
-          schema:
-            $ref: "#/definitions/DefaultError"
         "403":
           description: "Permission Denied"
           schema:
             $ref: "#/definitions/DefaultError"
-        "404":
-          description: "User not found"
+        "500":
+          description: "Internal Server Error"
           schema:
             $ref: "#/definitions/DefaultError"
   /users/{user_id}/events:
