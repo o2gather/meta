@@ -625,6 +625,12 @@ definitions:
         description: "最多數量"
         minimum: 2
         example: "2"
+      amount:
+        type: "number"
+        format: "int64"
+        description: "已參加數量"
+        minimum: 0
+        example: "0"
       members:
         type: "array"
         description: "已參加的成員（含發起者）清單（只限發起者可以看到）"
@@ -656,6 +662,7 @@ definitions:
       - end_time
       - min_amount
       - max_amount
+      - amount
   EventMsg:
     type: "object"
     properties:
