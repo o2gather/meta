@@ -99,12 +99,6 @@ paths:
                 description: "最多數量"
                 minimum: 2
                 example: "2"
-              invited:
-                type: "array"
-                description: "邀請名單 (email)"
-                items:
-                  type: "string"
-                  format: "email"
             required:
               - name
               - description
@@ -121,6 +115,10 @@ paths:
             $ref: "#/definitions/Event"
         "400":
           description: "Invalid body"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "403":
+          description: "Permission Denied"
           schema:
             $ref: "#/definitions/DefaultError"
         "500":
@@ -196,16 +194,16 @@ paths:
                 format: "int32"
                 description: "團購結束時間"
                 example: "1680153140"
-              min_people:
+              min_amount:
                 type: "number"
                 format: "int64"
-                description: "最少人數"
+                description: "最少數量"
                 minimum: 2
                 example: "2"
-              max_people:
+              max_amount:
                 type: "number"
                 format: "int64"
-                description: "最多人數"
+                description: "最多數量"
                 minimum: 2
                 example: "2"
             required:
@@ -251,6 +249,10 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/DefaultMsg"
+        "403":
+          description: "Permission Denied"
+          schema:
+            $ref: "#/definitions/DefaultError"
         "404":
           description: "Event not found"
           schema:
@@ -292,7 +294,15 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/Event"
+            $ref: "#/definitions/DefaultMsg"
+        "400":
+          description: "Owning event or Has joined"
+          schema:
+            $ref: "#/definitions/DefaultError"
+        "403":
+          description: "Permission Denied"
+          schema:
+            $ref: "#/definitions/DefaultError"
         "404":
           description: "Event not found"
           schema:
@@ -387,9 +397,11 @@ paths:
         "200":
           description: "successful operation"
           schema:
-            $ref: "#/definitions/EventMsg"
-        "400":
-          description: "Invalid body"
+            type: array
+            items:
+              $ref: "#/definitions/EventMsg"
+        "403":
+          description: "Permission Denied"
           schema:
             $ref: "#/definitions/DefaultError"
         "404":
@@ -414,7 +426,10 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Category"
+              schema:
+                type: "string"
+                description: "類別名稱"
+                example: "類別名稱"
         "500":
           description: "Internal Server Error"
           schema:
@@ -427,7 +442,7 @@ paths:
       description: "導向至 https://accounts.google.com/o/oauth2/v2/auth 取得同意授權後，取得ID、姓名"
       operationId: "Login"
       produces:
-        - "applicatoin/json"
+        - "application/json"
       responses:
         "303":
           description: "redirect to homepage"
@@ -572,6 +587,10 @@ definitions:
       id:
         type: "string"
         format: "uuid"
+      user_id:
+        type: "string"
+        format: "uuid"
+        description: "發起者ID"
       name:
         type: "string"
         description: "團購名稱"
@@ -624,7 +643,6 @@ definitions:
               format: "int32"
               example: "1"
           required:
-            - id
             - name
             - email
             - phone
@@ -641,10 +659,6 @@ definitions:
   EventMsg:
     type: "object"
     properties:
-      id:
-        type: "string"
-        description: "訊息ID"
-        example: "訊息ID"
       content:
         type: "string"
         description: "訊息內容"
