@@ -662,10 +662,29 @@ components:
         id:
           type: string
           format: uuid
-        user_id:
-          type: string
-          format: uuid
-          description: 發起者ID
+        owner:
+          type: object
+          description: 發起者
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+              description: 使用者名稱
+              example: 使用者名稱
+            avatar:
+              type: string
+              format: url
+              description: 使用者頭像
+              example: https://example.com/avatar.png
+            email:
+              type: string
+              format: email
+              description: 使用者信箱
+          required:
+            - name
+            - avatar
         name:
           type: string
           description: 團購名稱
@@ -708,7 +727,7 @@ components:
           example: "0"
         members:
           type: array
-          description: 已參加的成員（含發起者）清單（只限發起者可以看到）
+          description: 已參加的成員清單（只限發起者可以看到）
           items:
             properties:
               name:
@@ -727,6 +746,12 @@ components:
               - email
               - phone
               - amount
+        members_count:
+          type: number
+          format: int64
+          description: 已參加的成員人數
+          minimum: 0
+          example: "0"
       required:
         - id
         - name
