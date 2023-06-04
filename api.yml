@@ -718,7 +718,6 @@ components:
                 format: email
               phone:
                 type: string
-                pattern: ^09[0-9]{8}$
               amount:
                 type: number
                 format: int32
@@ -814,4 +813,3 @@ components:
           format: email
         phone:
           type: string
-          pattern: ^09[0-9]{8}$
