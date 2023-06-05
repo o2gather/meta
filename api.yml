@@ -752,6 +752,10 @@ components:
           description: 已參加的成員人數
           minimum: 0
           example: "0"
+        established:
+          type: boolean
+          description: 是否成立
+          example: false
       required:
         - id
         - name
@@ -762,6 +766,7 @@ components:
         - min_amount
         - max_amount
         - amount
+        - established
     EventMsg:
       type: object
       properties:
