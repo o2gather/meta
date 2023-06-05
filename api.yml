@@ -215,6 +215,10 @@ paths:
                   description: 最多數量
                   minimum: 2
                   example: "2"
+                established:
+                  type: boolean
+                  description: 是否成立
+                  example: false
               required:
                 - name
                 - description
