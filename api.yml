@@ -225,8 +225,8 @@ paths:
                 - category
                 - start_time
                 - end_time
-                - min_people
-                - max_people
+                - min_amount
+                - max_amount
         description: 更新團購
         required: true
       responses:
