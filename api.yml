@@ -217,7 +217,7 @@ paths:
                   example: "2"
                 established:
                   type: boolean
-                  description: 是否成立
+                  description: 是否成立 (只限發起者可以更新，且只能更新為true)
                   example: false
               required:
                 - name
@@ -371,6 +371,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DefaultMsg"
+        "400":
+          description: Owning event or Has joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultError"
         "404":
           description: Event not found
           content:
@@ -729,6 +735,10 @@ components:
           description: 已參加數量
           minimum: 0
           example: "0"
+        established:
+          type: boolean
+          description: 是否成立
+          example: false
         members:
           type: array
           description: 已參加的成員清單（只限發起者可以看到）
@@ -756,10 +766,6 @@ components:
           description: 已參加的成員人數
           minimum: 0
           example: "0"
-        established:
-          type: boolean
-          description: 是否成立
-          example: false
       required:
         - id
         - name
